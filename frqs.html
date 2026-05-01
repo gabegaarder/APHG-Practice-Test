@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APHG FRQ Mastery Suite</title>
+    <style>
+        :root { --primary: #1e293b; --accent: #4f46e5; --bg: #f1f5f9; --success: #16a34a; --danger: #dc2626; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: #1e293b; line-height: 1.6; }
+        .app-container { width: 100%; max-width: 900px; margin: 2rem auto; background: white; min-height: 90vh; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+        header { background: var(--primary); color: white; padding: 1.5rem 2rem; border-bottom: 4px solid var(--accent); }
+        .screen { padding: 2rem; flex-grow: 1; }
+        .hidden { display: none !important; }
+        .prompt-box { background: #fffbeb; padding: 1.5rem; border-radius: 8px; border-left: 5px solid #f59e0b; margin-bottom: 1.5rem; font-size: 1.1rem; }
+        textarea { width: 100%; height: 350px; padding: 1rem; border-radius: 8px; border: 2px solid #e2e8f0; font-family: inherit; font-size: 1rem; margin-top: 1rem; box-sizing: border-box; resize: vertical; }
+        button { background: var(--accent); color: white; border: none; padding: 16px 32px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 1rem; font-size: 1rem; transition: 0.2s; }
+        button:hover { background: #4338ca; transform: translateY(-1px); }
+        .feedback-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 1.2rem; border-radius: 8px; margin-top: 1rem; transition: 0.3s; }
+        .score-header { font-size: 2rem; font-weight: 800; text-align: center; color: var(--accent); margin-bottom: 1rem; }
+        .nav-link { color: #64748b; text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1rem; }
+        .nav-link:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <a href="index.html" class="nav-link" style="color: #94a3b8;">← Back to MCQ Exam</a>
+        <h1 style="margin:0;">APHG 7-Part FRQ Trainer</h1>
+        <p style="margin: 0.5rem 0 0; opacity: 0.8;">Simulating College Board Scoring Logic</p>
+    </header>
+
+    <div id="setup-frq" class="screen">
+        <h2>Practice Mode</h2>
+        <p>This engine will select a random 7-part FRQ from the library. Your response will be scanned for essential AP terminology to estimate your score.</p>
+        <button onclick="startFRQ()">Generate Random FRQ</button>
+    </div>
+
+    <div id="frq-work-area" class="screen hidden">
+        <h2 id="frq-title" style="color: var(--primary);"></h2>
+        <div id="frq-prompt" class="prompt-box"></div>
+        <textarea id="frq-input" placeholder="Label your sections (A, B, C...) and write your full response here..."></textarea>
+        <button onclick="gradeFRQ()">Submit for Automated Review</button>
+    </div>
+
+    <div id="frq-results" class="screen hidden">
+        <div class="score-header" id="final-score-display">0 / 7</div>
+        <div id="frq-feedback-list"></div>
+        <button onclick="location.reload()" style="background: var(--primary);">Try Another Prompt</button>
+    </div>
+</div>
+
+<script>
+const frqLibrary = [
+    {
+        title: "FRQ 1: Urban Dynamics & Sustainability",
+        prompt: "A. Describe one type of voluntary migration.<br>B. Explain how migration may affect a city’s economy.<br>C. Describe one type of housing discrimination that may occur in urban areas.<br>D. Explain how a city’s infrastructure affects society.<br>E. Describe one challenge to sustainability in urban areas.<br>F. Explain how urban design initiatives are intended to affect cities.<br>G. Explain why urban design initiatives may be criticized.",
+        rubric: [
+            {id:"A", kw:["step","chain","transhumance","jobs","economic","guest worker"], desc:"Voluntary Migration"},
+            {id:"B", kw:["labor","tax","consumer","demand","wages","informal sector"], desc:"Economy Impact"},
+            {id:"C", kw:["redlining","blockbusting","steering","segregation","restrictive covenant"], desc:"Housing Discrimination"},
+            {id:"D", kw:["access","transit","sanitation","utility","healthcare","education"], desc:"Infrastructure"},
+            {id:"E", kw:["sprawl","pollution","waste","congestion","water","heat island"], desc:"Sustainability"},
+            {id:"F", kw:["walkability","mixed-use","green","transit","livable","new urbanism"], desc:"Design Intent"},
+            {id:"G", kw:["cost","displacement","gentrification","parking","character","affordability"], desc:"Criticism"}
+        ]
+    },
+    {
+        title: "FRQ 2: Political Geography & Devolution",
+        prompt: "A. Define devolution.<br>B. Describe how cultural diversity contributes to devolutionary pressures.<br>C. Describe how regional economic differences contribute to devolutionary pressures.<br>D. Describe how physical geography and territorial size contribute to devolutionary pressures.<br>E. Identify the political phenomenon represented by irregularly shaped voting districts.<br>F. Explain the relationship between redistricting and the census.<br>G. Explain ONE political consequence that could result from redistricting.",
+        rubric: [
+            {id:"A", kw:["power","central","regional","transfer","autonomy"], desc:"Devolution Definition"},
+            {id:"B", kw:["ethnic","minority","language","religion","separatism"], desc:"Cultural Pressure"},
+            {id:"C", kw:["wealth","tax","inequality","resources","development"], desc:"Economic Pressure"},
+            {id:"D", kw:["island","mountain","isolated","distance","fragmented"], desc:"Physical Pressure"},
+            {id:"E", kw:["gerrymandering"], desc:"Gerrymandering"},
+            {id:"F", kw:["population","seats","house","count","reapportionment"], desc:"Census/Redistricting"},
+            {id:"G", kw:["partisan","incumbent","polarization","advantage","safe seat"], desc:"Political Consequence"}
+        ]
+    },
+    {
+        title: "FRQ 3: Agriculture & The Green Revolution",
+        prompt: "A. Define carrying capacity.<br>B. Describe one way that humans have altered the environmental sustainability of agricultural lands.<br>C. Explain how transportation technology has increased economies of scale in the agricultural sector.<br>D. Explain a likely negative economic outcome of Green Revolution practices on rural communities.<br>E. Explain ONE weakness of Malthusian theory today.<br>F. Explain how surplus food production has changed the global market.<br>G. Explain the degree to which Green Revolution practices were effective in reducing hunger.",
+        rubric: [
+            {id:"A", kw:["max","environment","support","population"], desc:"Carrying Capacity"},
+            {id:"B", kw:["irrigation","chemicals","pesticide","terrace","fertilizer"], desc:"Sustainability"},
+            {id:"C", kw:["global","export","refrigeration","lower cost","distribution"], desc:"Economies of Scale"},
+            {id:"D", kw:["debt","small farmers","jobs","displacement","inequality"], desc:"Economic Impact"},
+            {id:"E", kw:["tech","green revolution","contraception","yield","production"], desc:"Malthus Weakness"},
+            {id:"F", kw:["cheap","imports","competition","local farmers","global price"], desc:"Market Change"},
+            {id:"G", kw:["calories","increase","production","hunger","poverty"], desc:"Effectiveness"}
+        ]
+    },
+    {
+        title: "FRQ 4: Industrialization & Global Development",
+        prompt: "A. Define the primary sector.<br>B. Describe how a country’s Human Development Index (HDI) is calculated.<br>C. Explain the core-periphery model according to Wallerstein.<br>D. Explain how break-of-bulk points reduce transportation costs.<br>E. Describe one characteristic of a Special Economic Zone (SEZ).<br>F. Explain how outsourcing affects the secondary sector in MDCs.<br>G. Explain why microloans are effective for development in LDCs.",
+        rubric: [
+            {id:"A", kw:["extraction","resource","mining","farming","raw"], desc:"Primary Sector"},
+            {id:"B", kw:["wealth","health","education","gni","life expectancy"], desc:"HDI Components"},
+            {id:"C", kw:["core","periphery","dependence","wealthy","exploitation"], desc:"World Systems"},
+            {id:"D", kw:["transfer","ship","rail","truck","intermodal"], desc:"Break-of-bulk"},
+            {id:"E", kw:["tax","foreign","investment","export","incentive"], desc:"SEZ"},
+            {id:"F", kw:["job loss","deindustrialization","cheap labor","offshoring"], desc:"Outsourcing MDC"},
+            {id:"G", kw:["women","small business","poverty","loan","startup"], desc:"Microloans"}
+        ]
+    },
+    {
+        title: "FRQ 5: Population & Health Trends",
+        prompt: "A. Define infant mortality rate.<br>B. Describe the characteristics of Stage 2 of the Demographic Transition Model.<br>C. Explain how the medical revolution changed CDR in LDCs.<br>D. Explain the impact of an aging population on a state’s dependency ratio.<br>E. Describe one pro-natalist policy a government might implement.<br>F. Explain how Ravenstein’s laws relate to the concept of distance decay.<br>G. Explain why refugees differ from traditional economic migrants.",
+        rubric: [
+            {id:"A", kw:["death","infant","birth","year","thousand"], desc:"IMR Definition"},
+            {id:"B", kw:["high birth","falling death","rapid","growth","industrial"], desc:"DTM Stage 2"},
+            {id:"C", kw:["diffusion","medicine","vaccine","sanitation","penicillin"], desc:"Medical Rev"},
+            {id:"D", kw:["elderly","tax","working","burden","support"], desc:"Dependency Ratio"},
+            {id:"E", kw:["subsidy","childcare","tax break","bonus","leave"], desc:"Pro-natalist"},
+            {id:"F", kw:["short distance","frequency","travel","interaction"], desc:"Ravenstein/Decay"},
+            {id:"G", kw:["persecution","force","fear","violence","war"], desc:"Refugee Cause"}
+        ]
+    },
+    {
+        title: "FRQ 6: Cultural Identity & Diffusion",
+        prompt: "A. Define cultural landscape.<br>B. Describe how sequent occupance is visible in modern cities.<br>C. Explain the difference between an ethnic religion and a universalizing religion.<br>D. Explain how a lingua franca facilitates global economic trade.<br>E. Describe one factor that leads to the extinction or death of languages.<br>F. Explain how social media contributes to hierarchical diffusion patterns.<br>G. Explain one way the physical environment influences folk culture.",
+        rubric: [
+            {id:"A", kw:["modified","human","environment","landscape","built"], desc:"Cultural Landscape"},
+            {id:"B", kw:["layers","history","architecture","imprint","reused"], desc:"Sequent Occupance"},
+            {id:"C", kw:["universal","ethnic","convert","born","spatial"], desc:"Religion Types"},
+            {id:"D", kw:["trade","english","communication","common","business"], desc:"Lingua Franca"},
+            {id:"E", kw:["globalization","death","policy","modernization","assimilation"], desc:"Language Loss"},
+            {id:"F", kw:["celebrity","influence","nodes","viral","trend"], desc:"Diffusion Path"},
+            {id:"G", kw:["food","housing","climate","resources","local"], desc:"Env Influence"}
+        ]
+    },
+    {
+        title: "FRQ 7: Urban Land Use Models",
+        prompt: "A. Define a primate city.<br>B. Describe the rank-size rule.<br>C. Explain how threshold and range influence the size and location of cities.<br>D. Explain why metacities are growing rapidly in LDCs.<br>E. Describe one social or economic challenge of squatter settlements.<br>F. Explain how the sector model differs from the concentric zone model.<br>G. Explain the role of world cities in the global financial system.",
+        rubric: [
+            {id:"A", kw:["twice","largest","dominant","size"], desc:"Primate City"},
+            {id:"B", kw:["1/n","fraction","size","rank","proportional"], desc:"Rank-Size Rule"},
+            {id:"C", kw:["distance","customers","minimum","market","travel"], desc:"Threshold/Range"},
+            {id:"D", kw:["urbanization","rural-urban","jobs","pull","natural"], desc:"Metacity Growth"},
+            {id:"E", kw:["sanitation","crime","poverty","water","tenure"], desc:"Squatter Challenge"},
+            {id:"F", kw:["transport","wedges","corridors","spine"], desc:"Model Difference"},
+            {id:"G", kw:["stock","banking","influence","hq","finance"], desc:"World Cities"}
+        ]
+    },
+    {
+        title: "FRQ 8: Borders & Sovereignty",
+        prompt: "A. Define sovereignty.<br>B. Describe a superimposed boundary.<br>C. Explain how the Law of the Sea defines an Exclusive Economic Zone (EEZ).<br>D. Explain why landlocked states face significant economic challenges.<br>E. Identify the purpose of the Berlin Conference of 1884.<br>F. Explain how supranationalism can limit individual state sovereignty.<br>G. Explain the role of a stateless nation in regional political conflict.",
+        rubric: [
+            {id:"A", kw:["control","internal","external","authority","legitimacy"], desc:"Sovereignty"},
+            {id:"B", kw:["forced","colonial","africa","ignored","culture"], desc:"Superimposed"},
+            {id:"C", kw:["200","nautical","miles","resource","fishing"], desc:"EEZ"},
+            {id:"D", kw:["ocean","trade","transit","neighbor","port"], desc:"Landlocked"},
+            {id:"E", kw:["colonial","africa","borders","europe","scramble"], desc:"Berlin Conf"},
+            {id:"F", kw:["eu","treaty","policy","un","currency"], desc:"Supranationalism"},
+            {id:"G", kw:["kurds","territory","unrest","homeland","autonomy"], desc:"Stateless Nation"}
+        ]
+    },
+    {
+        title: "FRQ 9: Gender, Labor & Development",
+        prompt: "A. Define the Gender Inequality Index (GII).<br>B. Describe how female literacy rates relate to Total Fertility Rate (TFR).<br>C. Explain the role of women in subsistence agriculture in LDCs.<br>D. Explain why the gender gap exists in manufacturing jobs in developing nations.<br>E. Describe one challenge women face in the globalized industrial workforce.<br>F. Explain how microfinance specifically targets women to reduce poverty.<br>G. Explain how improving gender equality promotes a higher national GDP.",
+        rubric: [
+            {id:"A", kw:["inequality","health","labor","empowerment","disparity"], desc:"GII Definition"},
+            {id:"B", kw:["inverse","lower","education","delay","opportunity"], desc:"Literacy/TFR"},
+            {id:"C", kw:["labor","food","unpaid","domestic","primary"], desc:"Subsistence Women"},
+            {id:"D", kw:["wage","access","education","discrimination","custom"], desc:"Gender Gap"},
+            {id:"E", kw:["pay","childcare","harassment","double","exploit"], desc:"Workforce Challenge"},
+            {id:"F", kw:["group","collateral","empower","small","entrepreneur"], desc:"Microfinance"},
+            {id:"G", kw:["productivity","market","income","growth","tax"], desc:"GDP Effect"}
+        ]
+    },
+    {
+        title: "FRQ 10: Environmental Governance & Resources",
+        prompt: "A. Define sustainable development.<br>B. Describe the concept of environmental possibilism.<br>C. Explain how intensive farming can lead to desertification.<br>D. Explain the purpose of a greenbelt in modern urban planning.<br>E. Describe one environmental impact of the Industrial Revolution.<br>F. Explain how ecotourism attempts to balance profit and conservation.<br>G. Explain the degree to which global climate change affects human migration.",
+        rubric: [
+            {id:"A", kw:["future","needs","resource","balance","generations"], desc:"Sustainability"},
+            {id:"B", kw:["adjust","limit","technology","choice","possibility"], desc:"Possibilism"},
+            {id:"C", kw:["soil","erosion","overuse","dry","nutrient"], desc:"Desertification"},
+            {id:"D", kw:["sprawl","boundary","open space","growth","limit"], desc:"Greenbelt"},
+            {id:"E", kw:["co2","pollution","warming","fossil","smog"], desc:"Industrial Rev"},
+            {id:"F", kw:["nature","local","sustainable","wildlife","travel"], desc:"Ecotourism"},
+            {id:"G", kw:["sea level","drought","forced","refugee","disaster"], desc:"Climate Migration"}
+        ]
+    }
+];
+
+let activeFrq = null;
+
+function startFRQ() {
+    activeFrq = frqLibrary[Math.floor(Math.random() * frqLibrary.length)];
+    document.getElementById('setup-frq').classList.add('hidden');
+    document.getElementById('frq-work-area').classList.remove('hidden');
+    document.getElementById('frq-title').innerText = activeFrq.title;
+    document.getElementById('frq-prompt').innerHTML = activeFrq.prompt;
+}
+
+function gradeFRQ() {
+    const input = document.getElementById('frq-input').value.toLowerCase();
+    const fbList = document.getElementById('frq-feedback-list');
+    fbList.innerHTML = '';
+    let earned = 0;
+
+    activeFrq.rubric.forEach(part => {
+        const hasKeywords = part.kw.some(word => input.includes(word));
+        if(hasKeywords) earned++;
+
+        const card = document.createElement('div');
+        card.className = 'feedback-card';
+        card.style.borderLeft = hasKeywords ? '5px solid var(--success)' : '5px solid var(--danger)';
+        card.innerHTML = `
+            <strong>Part ${part.id}: ${part.desc}</strong><br>
+            <span>${hasKeywords ? '✅ Point Awarded' : '❌ Key Terminology Missing'}</span>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
+                Required Concepts: ${part.kw.slice(0, 3).join(", ")}...
+            </p>
+        `;
+        fbList.appendChild(card);
+    });
+
+    document.getElementById('frq-work-area').classList.add('hidden');
+    document.getElementById('frq-results').classList.remove('hidden');
+    document.getElementById('final-score-display').innerText = `${earned} / ${activeFrq.rubric.length}`;
+}
+</script>
+</body>
+</html>
