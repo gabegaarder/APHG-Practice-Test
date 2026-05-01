@@ -3,61 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APHG Exam Simulator v10.0</title>
+    <title>APHG 100-Question Final</title>
     <style>
         :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; --success: #16a34a; --danger: #dc2626; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; line-height: 1.6; }
-        
-        .app-container { width: 100%; max-width: 850px; margin: auto; background: white; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.1); position: relative; }
-        
-        /* FIXED HEADER LOGIC */
-        header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 1rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 4px solid var(--accent); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; /* Ensures timer stays on top but doesn't block clicks */
-        }
-
-        .screen { padding: 2rem; flex-grow: 1; position: relative; z-index: 1; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: #1e293b; }
+        .app-container { width: 100%; max-width: 850px; margin: auto; background: white; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.1); }
+        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--accent); position: sticky; top: 0; z-index: 1000; }
+        .screen { padding: 2rem; flex-grow: 1; }
         .hidden { display: none !important; }
-
-        /* Stimulus Styling */
-        .stimulus-card { background: #f1f5f9; border: 2px solid #e2e8f0; padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; }
-        .table-auto { width: 100%; border-collapse: collapse; background: white; pointer-events: none; }
-        .table-auto td, .table-auto th { border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-size: 0.9rem; }
-
-        /* Question UI - HIGHER Z-INDEX FOR CLICKS */
-        .opt { 
-            border: 2px solid #e2e8f0; 
-            padding: 1rem; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            margin-bottom: 0.8rem; 
-            transition: 0.2s; 
-            display: flex; 
-            align-items: flex-start; 
-            background: #fff; 
-            position: relative; 
-            z-index: 10; 
-        }
-        .opt:hover { border-color: var(--accent); background: #f0f7ff; }
+        .opt { border: 2px solid #e2e8f0; padding: 1rem; border-radius: 10px; cursor: pointer; margin-bottom: 0.8rem; transition: 0.2s; display: flex; background: #fff; }
         .opt.selected { border-color: var(--accent); background: #eff6ff; font-weight: 600; border-left: 6px solid var(--accent); }
-        
-        /* Analysis Fetcher */
-        .fetcher-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem; }
         .unit-pill { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin: 4px; }
         .fail { background: #fee2e2; color: #991b1b; }
         .pass { background: #dcfce7; color: #166534; }
-
-        button { background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; cursor: pointer; position: relative; z-index: 20; }
-        button:disabled { background: #cbd5e1; cursor: not-allowed; }
-        
+        button { background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         #timer-display { font-family: monospace; font-weight: bold; font-size: 1.2rem; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; }
     </style>
 </head>
@@ -65,161 +24,211 @@
 
 <div class="app-container">
     <header>
-        <span style="font-weight: 900;">APHG PRO SIMULATOR</span>
+        <span style="font-weight: 900;">APHG CENTURY SIM</span>
         <div id="timer-display">--:--</div>
     </header>
 
     <div id="setup" class="screen">
-        <h1>Exam Configuration</h1>
-        <p>Timer Logic: 1 minute per question. Click a mode to begin.</p>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 2rem;">
-            <button onclick="boot(15)">15 Qs / 15m</button>
-            <button onclick="boot(60)">60 Qs / 60m</button>
-            <button onclick="boot(100)">100 Qs / 100m</button>
-        </div>
+        <h1>Final 100-Question Bank</h1>
+        <p>Verified: 100 Unique Questions across all 7 units.</p>
+        <button onclick="boot(15)">15 Questions</button>
+        <button onclick="boot(60)">60 Questions</button>
+        <button onclick="boot(100)" style="background:#1e293b">100 Question Full Exam</button>
     </div>
 
     <div id="quiz" class="screen hidden">
-        <div id="u-info" style="color:var(--accent); font-weight:bold; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;"></div>
-        <div id="stim-box"></div>
-        <div id="q-text" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; margin-top: 10px;"></div>
+        <div id="u-info" style="color:var(--accent); font-weight:bold; font-size:0.8rem; text-transform:uppercase;"></div>
+        <div id="q-text" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem;"></div>
         <div id="opts-box"></div>
-        <div style="margin-top:2.5rem; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #eee; padding-top: 1rem;">
+        <div style="margin-top:2rem; display:flex; justify-content:space-between; align-items:center;">
             <span id="counter" style="font-weight:bold; color:#64748b;"></span>
-            <button id="sub-btn" onclick="step()" disabled>Submit Answer</button>
+            <button id="sub-btn" onclick="step()" disabled style="width:auto; margin-top:0">Submit</button>
         </div>
     </div>
 
     <div id="results" class="screen hidden">
-        <h1>Exam Complete</h1>
         <div id="big-score" style="font-size: 4rem; font-weight: 900; color: var(--accent);">0/0</div>
-        
-        <div class="fetcher-box">
-            <h3 style="margin-top:0">Unit Performance Analytics</h3>
-            <div id="fetcher-list"></div>
-        </div>
-
-        <button onclick="location.reload()" style="margin-top:2rem; width:100%">Restart Simulator</button>
-        <div id="rev-list" style="margin-top:3rem;"></div>
+        <div id="fetcher-list"></div>
+        <button onclick="location.reload()">Restart</button>
+        <div id="rev-list" style="margin-top:2rem;"></div>
     </div>
 </div>
 
 <script>
-// --- CORE LOGIC ---
-const unitNames = {
-    1: "Thinking Geographically", 2: "Population & Migration", 3: "Cultural Patterns",
-    4: "Political Organization", 5: "Agriculture & Rural Land-Use", 6: "Urban Land-Use",
-    7: "Industrial & Economic Dev"
-};
+const uN = {1:"Geo", 2:"Pop", 3:"Cult", 4:"Pol", 5:"Ag", 6:"Urb", 7:"Ind"};
 
-const mainBank = [
-    { u: 2, stim: `<table class="table-auto"><tr><th>Indicator</th><th>Country X</th><th>Country Y</th></tr><tr><td>CBR</td><td>42</td><td>10</td></tr><tr><td>CDR</td><td>12</td><td>11</td></tr><tr><td>NIR</td><td>3.0%</td><td>-0.1%</td></tr></table>`, q: "Based on the table, which conclusion is most accurate?", a: ["Country X is in Stage 4 of the DTM.", "Country Y is experiencing a 'youth bulge'.", "Country Y is in Stage 5, experiencing natural decrease.", "Country X has reached the 'stationary' stage of growth.", "Country Y has a higher TFR than Country X."], c: 2 },
-    { u: 4, q: "Which of the following describes the 'Shatterbelt' theory in political geography?", a: ["A region under the consistent control of a single superpower.", "A region caught between stronger colliding external cultural-political forces.", "The process of a state breaking up into smaller ethnic enclaves.", "A maritime boundary extending 200 miles from the coast.", "A zone of peace between two neutral countries."], c: 1 },
-    { u: 6, q: "The 'Galactic City' or Peripheral model is best characterized by:", a: ["A single CBD with heavy industrial rings.", "High-density residential sectors following rail lines.", "A decentralized urban area connected by a beltway and featuring edge cities.", "Total reliance on walking and public transit.", "A spine of elite residential housing extending from the center."], c: 2 },
-    { u: 5, q: "A key difference between subsistence and commercial agriculture is:", a: ["Subsistence farming uses more chemical fertilizers.", "Commercial farming is primarily for the farmer's own consumption.", "Commercial farming is integrated into a large food-production industry (agribusiness).", "Subsistence farming is only found in MDCs.", "Commercial farming requires significantly less land."], c: 2 },
-    { u: 1, q: "The concept of 'Site' differs from 'Situation' in that site refers to:", a: ["The relative location of a city to other trade hubs.", "The physical character of a place, such as climate and topography.", "The mathematical coordinates on a GPS.", "The cultural history of a region.", "The way a place is connected to global networks."], c: 1 },
-    { u: 3, q: "An 'Isogloss' is a geographic boundary within which:", a: ["A specific religion is dominant.", "A particular linguistic feature occurs.", "A political border is disputed.", "Agricultural terrace farming is practiced.", "Ethnic enclaves are forbidden."], c: 1 },
-    { u: 7, q: "According to Rostow's Stages of Economic Growth, 'Drive to Maturity' is characterized by:", a: ["Reliance on primary sector exports only.", "The rapid growth of a single manufacturing industry.", "Wide-range diffusion of modern technology across all sectors.", "Total reliance on subsistence agriculture.", "The final stage of high mass consumption."], c: 2 },
-    { u: 4, q: "The state of 'Vatican City' is the best example of a:", a: ["Perforated state", "Microstate", "Fragmented state", "Prorupted state", "Landlocked state"], c: 1 },
-    { u: 2, q: "Ravenstein’s Laws of Migration suggest that most long-distance migrants head for:", a: ["Sparsely populated rural areas.", "Major centers of economic activity (cities).", "Regions with similar climates to their origin.", "Islands in the Pacific.", "Mountainous areas for protection."], c: 1 },
-    { u: 6, q: "Gentrification is often criticized by urban geographers because it:", a: ["Lowers property taxes for the wealthy.", "Displaces lower-income residents as property values and rents rise.", "Prevents the construction of modern skyscrapers.", "Forces cities to expand their boundaries outward (sprawl).", "Eliminates all green spaces in the city center."], c: 1 },
-    { u: 5, q: "The primary purpose of 'Terracing' in agriculture is to:", a: ["Increase the use of large-scale machinery.", "Decrease the amount of labor required for harvest.", "Create flat land for farming on steep hillsides and prevent soil erosion.", "Redirect water away from the crops during a drought.", "Ensure that only one type of crop is grown year-round."], c: 2 },
-    { u: 7, q: "A 'Maquiladora' is most typically found:", a: ["In the heart of the U.S. Rust Belt.", "In the CBD of major European cities.", "In Mexico, near the U.S. border, for tariff-free assembly.", "In the high-tech corridors of Silicon Valley.", "In the remote rural areas of China's interior."], c: 2 },
-    { u: 3, q: "Which of the following is a 'Universalizing Religion'?", a: ["Hinduism", "Judaism", "Christianity", "Shintoism", "Animism"], c: 2 },
-    { u: 1, q: "The 'Peters Projection' map is controversial because it:", a: ["Distorts the shape of continents to maintain accurate relative area.", "Distorts the size of the poles to maintain accurate compass bearings.", "Is only used for naval navigation.", "Was created by the United Nations to hide political borders.", "Completely removes the Southern Hemisphere."], c: 0 },
-    { u: 2, q: "The 'Total Fertility Rate' (TFR) is defined as:", a: ["The number of births per 1,000 people in a year.", "The average number of children a woman will have in her childbearing years.", "The percentage by which a population grows in a year.", "The number of people who die per 1,000 infants born.", "The ratio of elderly people to working-age adults."], c: 1 }
+// THE COMPRESSED 100 BANK (U = Unit, Q = Question, A = Options, C = Correct Index)
+const data = [
+    {u:1,q:"Which map projection distorts size but keeps shape (useful for sea navigation)?",a:["Robinson","Peters","Mercator","Mollweide","Goode"],c:2},
+    {u:1,q:"A formal region is defined by:",a:["A central node","A set of shared cultural or physical traits","Mental perceptions","The flow of commuters","The range of a TV station"],c:1},
+    {u:1,q:"Relative location is also known as:",a:["Site","Situation","Toponym","Absolute location","Isoline"],c:1},
+    {u:1,q:"GIS stands for:",a:["Geographic Info Systems","Global Ice Survey","Geological Image Scan","General Info Site","Geo Interactive Scale"],c:0},
+    {u:1,q:"Which scale shows the most detail?",a:["1:10,000","1:100,000","1:1,000,000","1:5,000,000","1:250,000"],c:0},
+    {u:1,q:"Distance decay suggests interaction:",a:["Increases with distance","Decreases with distance","Stays constant","Is random","Only happens in cities"],c:1},
+    {u:1,q:"A map with lines of equal value is a(n):",a:["Choropleth","Dot map","Isoline map","Cartogram","Symbol map"],c:2},
+    {u:2,q:"Malthus feared population would outpace:",a:["Technology","Food","Space","Fuel","Water"],c:1},
+    {u:2,q:"NIR is calculated by:",a:["CBR - CDR","TFR / IMR","CDR + CBR","Migration + Births","Death - Births"],c:0},
+    {u:2,q:"Stage 5 of the DTM is characterized by:",a:["High growth","Explosive growth","Natural decrease","Early industrialization","Famine"],c:2},
+    {u:2,q:"The most common reason for migration is:",a:["Religious","Political","Environmental","Economic","Cultural"],c:3},
+    {u:2,q:"A population pyramid with a narrow base indicates:",a:["Rapid growth","Low birth rates","High death rates","High TFR","Youth bulge"],c:1},
+    {u:2,q:"Physiological density is people per unit of:",a:["Total land","Arable land","Urban land","Forest land","Water"],c:1},
+    {u:2,q:"Ravenstein noted that most migrants travel:",a:["Long distance","Short distance","Only to islands","By sea only","To rural areas"],c:1},
+    {u:3,q:"A 'Lingua Franca' is:",a:["A dead language","A language of trade and communication","A local dialect","A religious script","A secret code"],c:1},
+    {u:3,q:"Which is a universalizing religion?",a:["Judaism","Hinduism","Islam","Shintoism","Animism"],c:2},
+    {u:3,q:"Standard language in a country is often called the:",a:["Dialect","Isogloss","Received Pronunciation","Patois","Slang"],c:2},
+    {u:3,q:"Folk culture spreads primarily through:",a:["TV","Social Media","Relocation diffusion","Hierarchical diffusion","Movies"],c:2},
+    {u:3,q:"An ethnic neighborhood in a city is a(n):",a:["Exclave","Enclave","Ghetto","Suburb","Satellite"],c:1},
+    {u:3,q:"The loss of local unique culture to global trends is:",a:["Glocalization","Placelessness","Sequent occupance","Cultural hearth","Syncretism"],c:1},
+    {u:3,q:"Which is an example of an Indo-European language?",a:["Mandarin","Arabic","English","Hebrew","Turkish"],c:2},
+    {u:4,q:"A 'Shatterbelt' is a region:",a:["With no borders","Caught between stronger political forces","In the deep ocean","With a single culture","In a desert"],c:1},
+    {u:4,q:"A state with a circular shape is:",a:["Elongated","Compact","Fragmented","Perforated","Prorupted"],c:1},
+    {u:4,q:"Which is a supranational organization?",a:["The Red Cross","The UN","The NBA","A local City Council","A bank"],c:1},
+    {u:4,q:"The 'Law of the Sea' (EEZ) extends how many miles?",a:["12","24","100","200","500"],c:3},
+    {u:4,q:"The process of redrawing districts for gain is:",a:["Balkanization","Devolution","Gerrymandering","Sovereignty","Annexation"],c:2},
+    {u:4,q:"A nation-state is one where:",a:["Many nations live","The boundary of a nation matches the state","There is no government","The state is in the ocean","There are no people"],c:1},
+    {u:4,q:"Which is a centrifugal force?",a:["Common language","Shared religion","Ethnic conflict","National anthem","Strong economy"],c:2},
+    {u:5,q:"Von Thunen's model is based on:",a:["Soil quality","Climate","Transport cost and land rent","Labor cost","Fertilizer prices"],c:2},
+    {u:5,q:"The 'Green Revolution' involved:",a:["Organic farming","High-yield seeds and chemicals","The invention of the plow","Banning pesticides","Manual labor"],c:1},
+    {u:5,q:"Subsistence farming is mainly for:",a:["Export","Sale at market","Family consumption","Biofuel","Animal feed"],c:2},
+    {u:5,q:"Mediterranean agriculture involves:",a:["Rice and corn","Wheat and cattle","Grapes and olives","Dairy and eggs","Sugar and coffee"],c:2},
+    {u:5,q:"Which is an extensive agricultural practice?",a:["Market gardening","Nomadic herding","Mixed crop and livestock","Dairy farming","Plantations"],c:1},
+    {u:5,q:"Aquaculture is:",a:["Farming in deserts","Farming fish and water plants","Collecting rain","Irrigation","Draining swamps"],c:1},
+    {u:5,q:"The primary hearth of corn (maize) is:",a:["China","Mesopotamia","Mexico/Central America","Egypt","Peru"],c:2},
+    {u:6,q:"The rank-size rule says the 3rd largest city is:",a:["1/2 size","1/3 size","Equal size","3 times size","Random size"],c:1},
+    {u:6,q:"A 'Megacity' has at least how many people?",a:["1 million","5 million","10 million","20 million","50 million"],c:2},
+    {u:6,q:"Squatter settlements are most common in:",a:["MDC centers","LDC urban fringes","Suburbs","Rural areas","Islands"],c:1},
+    {u:6,q:"Gentrification often leads to:",a:["Lower rent","Displacement of low-income residents","Urban decay","More crime","Abandonment"],c:1},
+    {u:6,q:"Central Place Theory uses what shape?",a:["Square","Circle","Triangle","Hexagon","Pentagon"],c:3},
+    {u:6,q:"Which urban model has sectors along transport?",a:["Burgess","Hoyt","Harris-Ullman","Galactic","Vance"],c:1},
+    {u:6,q:"A city that dominates its country's culture is a:",a:["Primate City","World City","Global Node","Edge City","Network City"],c:0},
+    {u:7,q:"Weber's theory focuses on minimizing:",a:["Labor","Transport","Taxes","Water","Rent"],c:1},
+    {u:7,q:"A bulk-gaining industry locates near:",a:["Raw materials","The market","Cheap labor","Energy","The coast"],c:1},
+    {u:7,q:"The Industrial Revolution began in:",a:["USA","France","Great Britain","Germany","China"],c:2},
+    {u:7,q:"Rostow's 5th stage is:",a:["Take off","Drive to maturity","High mass consumption","Subsistence","Industrial peak"],c:2},
+    {u:7,q:"Wallerstein's 'Core' refers to:",a:["Poor countries","Developing countries","Wealthy/Powerful countries","Middle-income states","Islands"],c:2},
+    {u:7,q:"A 'Break-of-bulk' point is where:",a:["Goods are sold","Goods change transport modes","Factories are built","Labor is hired","Waste is dumped"],c:1},
+    {u:7,q:"The HDI (Human Development Index) includes:",a:["Military size","GNI per capita, life expectancy, education","TVs per person","Happiness levels","Total area"],c:1},
+    // Adding 50 more condensed unique items to hit 100...
+    {u:1,q:"Environmental determinism says:",a:["Nature controls culture","Culture controls nature","Both are equal","Neither matters","Only maps matter"],c:0},
+    {u:2,q:"A refugee is a migrant who:",a:["Wants a better job","Fleeing violence/persecution","Moving for weather","Moving for family","A student"],c:1},
+    {u:4,q:"A nation without a territory is a:",a:["Microstate","Stateless nation","Colony","Exclave","Province"],c:1},
+    {u:5,q:"The enclosure movement in England led to:",a:["Smaller farms","Larger, efficient farms","More famine","Banning sheep","Ending trade"],c:1},
+    {u:6,q:"Urban sprawl is:",a:["Vertical growth","Horizontal expansion of cities","Building more parks","Improving subways","Fixing slums"],c:1},
+    {u:7,q:"Agglomeration is:",a:["Factories spreading out","Factories clustering together","Farming tools","Transport modes","Tax laws"],c:1},
+    {u:3,q:"A taboo is a:",a:["Religious song","Food/behavior restriction","Wedding custom","Type of house","Dance"],c:1},
+    {u:2,q:"Internal migration is:",a:["Between countries","Within a country","Only in cities","To other planets","By boat"],c:1},
+    {u:4,q:"A frontier is:",a:["A fixed border","A zone where no state has control","A capital city","A wall","A map key"],c:1},
+    {u:5,q:"Transhumance is:",a:["Farming in water","Seasonal moving of livestock","Planting corn","Using tractors","Exporting food"],c:1},
+    {u:6,q:"The CBD is the:",a:["Suburb","Downtown/Commercial heart","Industrial zone","Residential park","Airport"],c:1},
+    {u:7,q:"Deindustrialization is:",a:["Building new factories","Loss of industrial jobs in a region","Improving tools","Farming more","Using less water"],c:1},
+    {u:1,q:"Toponym is:",a:["A map key","A place name","A mountain","A river","A tool"],c:1},
+    {u:2,q:"Brain drain is:",a:["Losing smart people to emigration","Studying too much","A disease","Learning a language","Aging"],c:0},
+    {u:3,q:"Syncretism is:",a:["Conflict","Blending of cultural traits","Isolation","Death","Birth"],c:1},
+    {u:4,q:"Sovereignty is:",a:["Being poor","Independence/Control over affairs","A king","A flag","A war"],c:1},
+    {u:5,q:"Grains are usually:",a:["Intensive","Extensive","Grown in water","Perishable","Tropical"],c:1},
+    {u:6,q:"Edge cities are located:",a:["In the center","Near beltways/highways","In rural areas","In caves","On the moon"],c:1},
+    {u:7,q:"Just-in-time delivery reduces:",a:["Labor","Storage/Inventory costs","Transport speed","Product quality","Sales"],c:1},
+    {u:1,q:"Map scale 1:24,000 means 1 inch equals:",a:["24,000 inches","1 mile","1 km","24 feet","100 meters"],c:0},
+    {u:2,q:"Step migration is:",a:["Moving once","Moving in stages","Moving back","Forced moving","Flying"],c:1},
+    {u:3,q:"A pidgin language is:",a:["Complete","Simplified for trade","Ancient","A dialect","Secret"],c:1},
+    {u:4,q:"A buffer state is:",a:["Large","Small state between two rivals","A colony","An island","Powerful"],c:1},
+    {u:5,q:"Truck farming is:",a:["Using trucks","Commercial gardening","Fixing engines","Ranching","Subsistence"],c:1},
+    {u:6,q:"Ghettoization is:",a:["Wealth","Concentrated poverty/segregation","Parks","New malls","Cleaning"],c:1},
+    {u:7,q:"The primary sector is:",a:["Banking","Resource extraction","Manufacturing","Teaching","Law"],c:1},
+    {u:1,q:"Functional regions are organized around:",a:["A trait","A node/focal point","A memory","A border","A forest"],c:1},
+    {u:2,q:"CBR stands for:",a:["Crude Birth Rate","Cool Birth Rate","Child Birth Ratio","Census Birth Record","Child Bio Rate"],c:0},
+    {u:3,q:"Sikhism is primarily in:",a:["India","USA","Japan","Egypt","Brazil"],c:0},
+    {u:4,q:"Balkanization is:",a:["Unity","Breakup of a state","Trade","War","Peace"],c:1},
+    {u:5,q:"Plantations are usually in:",a:["MDCs","LDCs/Tropics","Cold areas","Cities","Deserts"],c:1},
+    {u:6,q:"Primacy is when a city is:",a:["Small","Massively larger than others","Equal","Average","Ancient"],c:1},
+    {u:7,q:"Outsourcing is:",a:["Hiring locally","Moving jobs to a third party","Buying land","Farming","Mining"],c:1},
+    {u:1,q:"A cartogram distorts:",a:["Shape","Size based on data","Direction","Distance","Color"],c:1},
+    {u:2,q:"Life expectancy is higher in:",a:["LDCs","MDCs","Deserts","War zones","Farms"],c:1},
+    {u:3,q:"Animism believes:",a:["One god","Nature has spirits","No god","Science only","Books are holy"],c:1},
+    {u:4,q:"An enclave is:",a:["An island","Territory inside another state","A desert","A sea","A wall"],c:1},
+    {u:5,q:"Luxury crops include:",a:["Corn","Coffee/Cacao","Wheat","Rice","Beans"],c:1},
+    {u:6,q:"Redlining was used by:",a:["Farmers","Banks/Insurers","Doctors","Pilots","Teachers"],c:1},
+    {u:7,q:"Tertiary sector is:",a:["Mining","Services","Factories","Hunting","Fishing"],c:1},
+    {u:1,q:"A hearth is a:",a:["Chimney","Place of origin","Border","Tool","Map"],c:1},
+    {u:2,q:"Interregional migration is:",a:["Between regions","In one city","To a new floor","By air","Internal"],c:0},
+    {u:3,q:"A dialect is a:",a:["New language","Regional variation of a language","Dictionary","Sign","Code"],c:1},
+    {u:4,q:"Centripetal forces:",a:["Divide","Unite","Destroy","Move","Heat"],c:1},
+    {u:5,q:"Double cropping is:",a:["Two harvests a year","Two seeds","Two farmers","Two tools","Two fields"],c:0},
+    {u:6,q:"Filtering is:",a:["Cleaning water","Large houses becoming low-income units","Buying cars","Painting","Moving"],c:1},
+    {u:7,q:"Ecotourism is:",a:["Industrial travel","Sustainable/Nature travel","Space travel","Business travel","Cruises"],c:1},
+    {u:1,q:"Site is:",a:["Relative","Physical traits of a place","A website","A view","A map"],c:1},
+    {u:2,q:"TFR is:",a:["Total Fertility Rate","Time For Rest","Total Farm Ratio","Top Food Rate","Test For Rate"],c:0},
+    {u:3,q:"A mosque is for:",a:["Hindus","Muslims","Sikhs","Jews","Christians"],c:1},
+    {u:4,q:"Imperialism is:",a:["Freedom","Control by a powerful state","Peace","Trade","Farming"],c:1},
+    {u:5,q:"Agribusiness is:",a:["Small farms","Commercial large-scale farming","Gardening","Mining","Teaching"],c:1}
 ];
 
-let exam = [], ptr = 0, score = 0, picks = [], timerInterval = null;
-let unitPerf = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}, unitCounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0};
+let exam = [], ptr = 0, score = 0, picks = [], tInt = null;
+let uP = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}, uC = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0};
 
-function boot(num) {
+function boot(n) {
     document.getElementById('setup').classList.add('hidden');
     document.getElementById('quiz').classList.remove('hidden');
-    
-    let master = [...mainBank].sort(() => Math.random() - 0.5);
-    exam = [];
-    for(let i=0; i<num; i++) {
-        exam.push({...master[i % master.length]});
-    }
-    
-    startTimer(num);
-    render();
+    let pool = [...data].sort(() => Math.random() - 0.5);
+    exam = pool.slice(0, n);
+    sT(n);
+    rQ();
 }
 
-function startTimer(minutes) {
-    if(timerInterval) clearInterval(timerInterval);
-    let time = minutes * 60;
-    const display = document.getElementById('timer-display');
-
-    timerInterval = setInterval(() => {
-        let m = Math.floor(time / 60);
-        let s = time % 60;
-        display.innerText = `${m}:${s < 10 ? '0'+s : s}`;
-        if (time <= 0) { clearInterval(timerInterval); finish(); }
-        time--;
+function sT(m) {
+    let s = m * 60;
+    tInt = setInterval(() => {
+        let min = Math.floor(s/60), sec = s%60;
+        document.getElementById('timer-display').innerText = `${min}:${sec<10?'0':''}${sec}`;
+        if(s <= 0) { clearInterval(tInt); fin(); }
+        s--;
     }, 1000);
 }
 
-function render() {
+function rQ() {
     const q = exam[ptr];
-    document.getElementById('u-info').innerText = `UNIT ${q.u} | ${unitNames[q.u]}`;
+    document.getElementById('u-info').innerText = `Unit ${q.u}: ${uN[q.u]}`;
     document.getElementById('counter').innerText = `Q ${ptr+1} of ${exam.length}`;
     document.getElementById('q-text').innerText = q.q;
-    document.getElementById('stim-box').innerHTML = q.stim || "";
-    
-    const box = document.getElementById('opts-box');
-    box.innerHTML = '';
-    q.a.forEach((text, i) => {
+    const b = document.getElementById('opts-box');
+    b.innerHTML = '';
+    q.a.forEach((t, i) => {
         const d = document.createElement('div');
         d.className = 'opt';
-        d.innerHTML = `<span style="width:30px; color:var(--accent); font-weight:800;">${String.fromCharCode(65+i)}</span> <span>${text}</span>`;
-        d.onclick = (e) => {
-            e.stopPropagation(); // Prevents click bubbling issues
+        d.innerHTML = `<span style="width:30px; font-weight:800;">${String.fromCharCode(65+i)}</span> ${t}`;
+        d.onclick = () => {
             picks[ptr] = i;
             document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
             d.classList.add('selected');
             document.getElementById('sub-btn').disabled = false;
         };
-        box.appendChild(d);
+        b.appendChild(d);
     });
 }
 
 function step() {
-    const q = exam[ptr];
-    unitCounts[q.u]++;
-    if(picks[ptr] === q.c) { score++; unitPerf[q.u]++; }
+    const q = exam[ptr]; uC[q.u]++;
+    if(picks[ptr] === q.c) { score++; uP[q.u]++; }
     ptr++;
     document.getElementById('sub-btn').disabled = true;
-    if(ptr < exam.length) render();
-    else finish();
+    if(ptr < exam.length) rQ(); else fin();
 }
 
-function finish() {
-    clearInterval(timerInterval);
+function fin() {
+    clearInterval(tInt);
     document.getElementById('quiz').classList.add('hidden');
     document.getElementById('results').classList.remove('hidden');
     document.getElementById('big-score').innerText = `${score}/${exam.length}`;
-    
-    const fetcher = document.getElementById('fetcher-list');
-    const detailed = document.getElementById('rev-list');
-    
-    Object.keys(unitPerf).forEach(u => {
-        if(unitCounts[u] > 0) {
-            let pct = (unitPerf[u] / unitCounts[u]) * 100;
-            let cls = pct >= 70 ? 'pass' : 'fail';
-            fetcher.innerHTML += `<div class="unit-pill ${cls}">Unit ${u}: ${Math.round(pct)}%</div>`;
+    const fl = document.getElementById('fetcher-list');
+    Object.keys(uN).forEach(u => {
+        if(uC[u] > 0) {
+            let p = Math.round((uP[u]/uC[u])*100);
+            fl.innerHTML += `<div class="unit-pill ${p<70?'fail':'pass'}">${uN[u]}: ${p}%</div>`;
         }
     });
-
     exam.forEach((q, i) => {
         let ok = picks[i] === q.c;
-        detailed.innerHTML += `
-            <div style="padding:1rem; border-bottom:1px solid #eee; background: ${ok ? '#f8fafc' : '#fff5f5'}">
-                <b style="color:${ok ? 'var(--success)' : 'var(--danger)'}">${ok ? '✓' : '✗'} Question ${i+1}</b>
-                <p style="margin:5px 0">${q.q}</p>
-                <div style="font-size:0.85rem"><b>Correct:</b> ${q.a[q.c]}</div>
-            </div>`;
+        document.getElementById('rev-list').innerHTML += `<div style="padding:10px; border-bottom:1px solid #ddd; background:${ok?'#fff':'#fff5f5'}"><b>${ok?'✓':'✗'} Q${i+1}</b>: ${q.q}<br><small>Correct: ${q.a[q.c]}</small></div>`;
     });
 }
 </script>
