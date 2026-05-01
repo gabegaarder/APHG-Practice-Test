@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APHG Exam Simulator v10.0</title>
+    <style>
+        :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; --success: #16a34a; --danger: #dc2626; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; color: #1e293b; line-height: 1.6; }
+        
+        .app-container { width: 100%; max-width: 850px; margin: auto; background: white; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.1); position: relative; }
+        
+        /* FIXED HEADER LOGIC */
+        header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 4px solid var(--accent); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; /* Ensures timer stays on top but doesn't block clicks */
+        }
+
+        .screen { padding: 2rem; flex-grow: 1; position: relative; z-index: 1; }
+        .hidden { display: none !important; }
+
+        /* Stimulus Styling */
+        .stimulus-card { background: #f1f5f9; border: 2px solid #e2e8f0; padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .table-auto { width: 100%; border-collapse: collapse; background: white; pointer-events: none; }
+        .table-auto td, .table-auto th { border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-size: 0.9rem; }
+
+        /* Question UI - HIGHER Z-INDEX FOR CLICKS */
+        .opt { 
+            border: 2px solid #e2e8f0; 
+            padding: 1rem; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            margin-bottom: 0.8rem; 
+            transition: 0.2s; 
+            display: flex; 
+            align-items: flex-start; 
+            background: #fff; 
+            position: relative; 
+            z-index: 10; 
+        }
+        .opt:hover { border-color: var(--accent); background: #f0f7ff; }
+        .opt.selected { border-color: var(--accent); background: #eff6ff; font-weight: 600; border-left: 6px solid var(--accent); }
+        
+        /* Analysis Fetcher */
+        .fetcher-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 1.5rem; border-radius: 12px; margin-top: 2rem; }
+        .unit-pill { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin: 4px; }
+        .fail { background: #fee2e2; color: #991b1b; }
+        .pass { background: #dcfce7; color: #166534; }
+
+        button { background: var(--accent); color: white; border: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; cursor: pointer; position: relative; z-index: 20; }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        
+        #timer-display { font-family: monospace; font-weight: bold; font-size: 1.2rem; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <span style="font-weight: 900;">APHG PRO SIMULATOR</span>
+        <div id="timer-display">--:--</div>
+    </header>
+
+    <div id="setup" class="screen">
+        <h1>Exam Configuration</h1>
+        <p>Timer Logic: 1 minute per question. Click a mode to begin.</p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 2rem;">
+            <button onclick="boot(15)">15 Qs / 15m</button>
+            <button onclick="boot(60)">60 Qs / 60m</button>
+            <button onclick="boot(100)">100 Qs / 100m</button>
+        </div>
+    </div>
+
+    <div id="quiz" class="screen hidden">
+        <div id="u-info" style="color:var(--accent); font-weight:bold; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;"></div>
+        <div id="stim-box"></div>
+        <div id="q-text" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; margin-top: 10px;"></div>
+        <div id="opts-box"></div>
+        <div style="margin-top:2.5rem; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #eee; padding-top: 1rem;">
+            <span id="counter" style="font-weight:bold; color:#64748b;"></span>
+            <button id="sub-btn" onclick="step()" disabled>Submit Answer</button>
+        </div>
+    </div>
+
+    <div id="results" class="screen hidden">
+        <h1>Exam Complete</h1>
+        <div id="big-score" style="font-size: 4rem; font-weight: 900; color: var(--accent);">0/0</div>
+        
+        <div class="fetcher-box">
+            <h3 style="margin-top:0">Unit Performance Analytics</h3>
+            <div id="fetcher-list"></div>
+        </div>
+
+        <button onclick="location.reload()" style="margin-top:2rem; width:100%">Restart Simulator</button>
+        <div id="rev-list" style="margin-top:3rem;"></div>
+    </div>
+</div>
+
+<script>
+// --- CORE LOGIC ---
+const unitNames = {
+    1: "Thinking Geographically", 2: "Population & Migration", 3: "Cultural Patterns",
+    4: "Political Organization", 5: "Agriculture & Rural Land-Use", 6: "Urban Land-Use",
+    7: "Industrial & Economic Dev"
+};
+
+const mainBank = [
+    { u: 2, stim: `<table class="table-auto"><tr><th>Indicator</th><th>Country X</th><th>Country Y</th></tr><tr><td>CBR</td><td>42</td><td>10</td></tr><tr><td>CDR</td><td>12</td><td>11</td></tr><tr><td>NIR</td><td>3.0%</td><td>-0.1%</td></tr></table>`, q: "Based on the table, which conclusion is most accurate?", a: ["Country X is in Stage 4 of the DTM.", "Country Y is experiencing a 'youth bulge'.", "Country Y is in Stage 5, experiencing natural decrease.", "Country X has reached the 'stationary' stage of growth.", "Country Y has a higher TFR than Country X."], c: 2 },
+    { u: 4, q: "Which of the following describes the 'Shatterbelt' theory in political geography?", a: ["A region under the consistent control of a single superpower.", "A region caught between stronger colliding external cultural-political forces.", "The process of a state breaking up into smaller ethnic enclaves.", "A maritime boundary extending 200 miles from the coast.", "A zone of peace between two neutral countries."], c: 1 },
+    { u: 6, q: "The 'Galactic City' or Peripheral model is best characterized by:", a: ["A single CBD with heavy industrial rings.", "High-density residential sectors following rail lines.", "A decentralized urban area connected by a beltway and featuring edge cities.", "Total reliance on walking and public transit.", "A spine of elite residential housing extending from the center."], c: 2 },
+    { u: 5, q: "A key difference between subsistence and commercial agriculture is:", a: ["Subsistence farming uses more chemical fertilizers.", "Commercial farming is primarily for the farmer's own consumption.", "Commercial farming is integrated into a large food-production industry (agribusiness).", "Subsistence farming is only found in MDCs.", "Commercial farming requires significantly less land."], c: 2 },
+    { u: 1, q: "The concept of 'Site' differs from 'Situation' in that site refers to:", a: ["The relative location of a city to other trade hubs.", "The physical character of a place, such as climate and topography.", "The mathematical coordinates on a GPS.", "The cultural history of a region.", "The way a place is connected to global networks."], c: 1 },
+    { u: 3, q: "An 'Isogloss' is a geographic boundary within which:", a: ["A specific religion is dominant.", "A particular linguistic feature occurs.", "A political border is disputed.", "Agricultural terrace farming is practiced.", "Ethnic enclaves are forbidden."], c: 1 },
+    { u: 7, q: "According to Rostow's Stages of Economic Growth, 'Drive to Maturity' is characterized by:", a: ["Reliance on primary sector exports only.", "The rapid growth of a single manufacturing industry.", "Wide-range diffusion of modern technology across all sectors.", "Total reliance on subsistence agriculture.", "The final stage of high mass consumption."], c: 2 },
+    { u: 4, q: "The state of 'Vatican City' is the best example of a:", a: ["Perforated state", "Microstate", "Fragmented state", "Prorupted state", "Landlocked state"], c: 1 },
+    { u: 2, q: "Ravenstein’s Laws of Migration suggest that most long-distance migrants head for:", a: ["Sparsely populated rural areas.", "Major centers of economic activity (cities).", "Regions with similar climates to their origin.", "Islands in the Pacific.", "Mountainous areas for protection."], c: 1 },
+    { u: 6, q: "Gentrification is often criticized by urban geographers because it:", a: ["Lowers property taxes for the wealthy.", "Displaces lower-income residents as property values and rents rise.", "Prevents the construction of modern skyscrapers.", "Forces cities to expand their boundaries outward (sprawl).", "Eliminates all green spaces in the city center."], c: 1 },
+    { u: 5, q: "The primary purpose of 'Terracing' in agriculture is to:", a: ["Increase the use of large-scale machinery.", "Decrease the amount of labor required for harvest.", "Create flat land for farming on steep hillsides and prevent soil erosion.", "Redirect water away from the crops during a drought.", "Ensure that only one type of crop is grown year-round."], c: 2 },
+    { u: 7, q: "A 'Maquiladora' is most typically found:", a: ["In the heart of the U.S. Rust Belt.", "In the CBD of major European cities.", "In Mexico, near the U.S. border, for tariff-free assembly.", "In the high-tech corridors of Silicon Valley.", "In the remote rural areas of China's interior."], c: 2 },
+    { u: 3, q: "Which of the following is a 'Universalizing Religion'?", a: ["Hinduism", "Judaism", "Christianity", "Shintoism", "Animism"], c: 2 },
+    { u: 1, q: "The 'Peters Projection' map is controversial because it:", a: ["Distorts the shape of continents to maintain accurate relative area.", "Distorts the size of the poles to maintain accurate compass bearings.", "Is only used for naval navigation.", "Was created by the United Nations to hide political borders.", "Completely removes the Southern Hemisphere."], c: 0 },
+    { u: 2, q: "The 'Total Fertility Rate' (TFR) is defined as:", a: ["The number of births per 1,000 people in a year.", "The average number of children a woman will have in her childbearing years.", "The percentage by which a population grows in a year.", "The number of people who die per 1,000 infants born.", "The ratio of elderly people to working-age adults."], c: 1 }
+];
+
+let exam = [], ptr = 0, score = 0, picks = [], timerInterval = null;
+let unitPerf = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}, unitCounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0};
+
+function boot(num) {
+    document.getElementById('setup').classList.add('hidden');
+    document.getElementById('quiz').classList.remove('hidden');
+    
+    let master = [...mainBank].sort(() => Math.random() - 0.5);
+    exam = [];
+    for(let i=0; i<num; i++) {
+        exam.push({...master[i % master.length]});
+    }
+    
+    startTimer(num);
+    render();
+}
+
+function startTimer(minutes) {
+    if(timerInterval) clearInterval(timerInterval);
+    let time = minutes * 60;
+    const display = document.getElementById('timer-display');
+
+    timerInterval = setInterval(() => {
+        let m = Math.floor(time / 60);
+        let s = time % 60;
+        display.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+        if (time <= 0) { clearInterval(timerInterval); finish(); }
+        time--;
+    }, 1000);
+}
+
+function render() {
+    const q = exam[ptr];
+    document.getElementById('u-info').innerText = `UNIT ${q.u} | ${unitNames[q.u]}`;
+    document.getElementById('counter').innerText = `Q ${ptr+1} of ${exam.length}`;
+    document.getElementById('q-text').innerText = q.q;
+    document.getElementById('stim-box').innerHTML = q.stim || "";
+    
+    const box = document.getElementById('opts-box');
+    box.innerHTML = '';
+    q.a.forEach((text, i) => {
+        const d = document.createElement('div');
+        d.className = 'opt';
+        d.innerHTML = `<span style="width:30px; color:var(--accent); font-weight:800;">${String.fromCharCode(65+i)}</span> <span>${text}</span>`;
+        d.onclick = (e) => {
+            e.stopPropagation(); // Prevents click bubbling issues
+            picks[ptr] = i;
+            document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
+            d.classList.add('selected');
+            document.getElementById('sub-btn').disabled = false;
+        };
+        box.appendChild(d);
+    });
+}
+
+function step() {
+    const q = exam[ptr];
+    unitCounts[q.u]++;
+    if(picks[ptr] === q.c) { score++; unitPerf[q.u]++; }
+    ptr++;
+    document.getElementById('sub-btn').disabled = true;
+    if(ptr < exam.length) render();
+    else finish();
+}
+
+function finish() {
+    clearInterval(timerInterval);
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('big-score').innerText = `${score}/${exam.length}`;
+    
+    const fetcher = document.getElementById('fetcher-list');
+    const detailed = document.getElementById('rev-list');
+    
+    Object.keys(unitPerf).forEach(u => {
+        if(unitCounts[u] > 0) {
+            let pct = (unitPerf[u] / unitCounts[u]) * 100;
+            let cls = pct >= 70 ? 'pass' : 'fail';
+            fetcher.innerHTML += `<div class="unit-pill ${cls}">Unit ${u}: ${Math.round(pct)}%</div>`;
+        }
+    });
+
+    exam.forEach((q, i) => {
+        let ok = picks[i] === q.c;
+        detailed.innerHTML += `
+            <div style="padding:1rem; border-bottom:1px solid #eee; background: ${ok ? '#f8fafc' : '#fff5f5'}">
+                <b style="color:${ok ? 'var(--success)' : 'var(--danger)'}">${ok ? '✓' : '✗'} Question ${i+1}</b>
+                <p style="margin:5px 0">${q.q}</p>
+                <div style="font-size:0.85rem"><b>Correct:</b> ${q.a[q.c]}</div>
+            </div>`;
+    });
+}
+</script>
+</body>
+</html>
