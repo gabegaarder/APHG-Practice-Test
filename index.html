@@ -527,16 +527,25 @@ function rQ() {
     document.getElementById('u-info').innerText = `Unit ${q.u}: ${uN[q.u]}`;
     document.getElementById('counter').innerText = `Q ${ptr+1} of ${exam.length}`;
     document.getElementById('q-text').innerText = q.q;
+    
     const b = document.getElementById('opts-box');
-    b.innerHTML = '';
+    b.innerHTML = ''; // Clear old options
+    
     q.a.forEach((t, i) => {
         const d = document.createElement('div');
         d.className = 'opt';
+        // Add the Letter (A, B, C...) and the text
         d.innerHTML = `<span style="width:30px; font-weight:800;">${String.fromCharCode(65+i)}</span> ${t}`;
+        
         d.onclick = () => {
-            picks[ptr] = i;
+            console.log("Selected option:", i); // This tells you it's working
+            picks[ptr] = i; // Save the answer
+            
+            // Visual feedback: remove 'selected' from others, add to this one
             document.querySelectorAll('.opt').forEach(el => el.classList.remove('selected'));
             d.classList.add('selected');
+            
+            // Enable the submit button now that an answer is picked
             document.getElementById('sub-btn').disabled = false;
         };
         b.appendChild(d);
