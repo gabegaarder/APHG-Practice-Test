@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APHG FRQ Mastery Suite</title>
     <style>
+        .frq-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+        }
+        .frq-card {
+        background: #fff;
+        border: 2px solid #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        }
+
+        .frq-card:hover {
+        border-color: var(--accent);
+        background: #f0f7ff;
+        transform: translateY(-2px);
+        }
         :root { --primary: #1e293b; --accent: #4f46e5; --bg: #f1f5f9; --success: #16a34a; --danger: #dc2626; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: #1e293b; line-height: 1.6; }
         .app-container { width: 100%; max-width: 900px; margin: 2rem auto; background: white; min-height: 90vh; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
@@ -31,9 +52,10 @@
     </header>
 
     <div id="setup-frq" class="screen">
-        <h2>Practice Mode</h2>
-        <p>This engine will select a random 7-part FRQ from the library. Your response will be scanned for essential AP terminology to estimate your score.</p>
-        <button onclick="startFRQ()">Generate Random FRQ</button>
+        <h2>Choose Your FRQ Prompt</h2>
+        <button onclick="startFRQ(-1)" style="background: #1e293b; margin-bottom: 20px;">🎲 Random Prompt</button>
+    
+        <div id="frq-selection-list" class="frq-grid"></div>
     </div>
 
     <div id="frq-work-area" class="screen hidden">
@@ -58,7 +80,7 @@ const frqLibrary = [
     {
         title: "FRQ 11: Population Pyramid Analysis (Stimulus)",
         type: "image",
-        stimulus: "https://en.wikipedia.org/wiki/Demographics_of_Japan",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Japan_population_pyramid_2026.png/330px-Japan_population_pyramid_2026.png",
         caption: "Figure 1: Population Pyramid of a Highly Developed Country (Stage 5 DTM)",
         prompt: "A. Identify the demographic stage of the country shown in the pyramid.<br>B. Describe the specific shape of the pyramid's base and what it indicates about the TFR.<br>C. Explain one social reason for the narrowing of the 0-14 age cohorts.<br>D. Explain one economic challenge this country will face in 20 years regarding its dependency ratio.<br>E. Describe one pro-natalist policy this government might use to shift the pyramid's shape.<br>F. Explain how the pyramid's shape reflects the country's position in the Epidemiologic Transition Model.<br>G. Explain why a country with this pyramid shape would likely have high rates of net-in migration.",
         rubric: [
@@ -97,7 +119,7 @@ const frqLibrary = [
     {
         title: "FRQ 13: The Demographic Transition Graph",
         type: "image",
-        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Demographic-Transition-Model.svg/1024px-Demographic-Transition-Model.svg.png",
+        stimulus: "https://populationeducation.org/wp-content/uploads/2014/10/dtm.png",
         caption: "Figure 2: The classic five stages of the Demographic Transition Model.",
         prompt: "A. Identify the stage where the Natural Increase Rate (NIR) is at its peak.<br>B. Describe the relationship between the CBR and CDR in Stage 4.<br>C. Explain why the death rate drops rapidly in Stage 2.<br>D. Explain why the birth rate begins to fall in Stage 3.<br>E. Describe the limitations of applying this model to LDCs today.<br>F. Explain how the Second Agricultural Revolution influenced the transition to Stage 2.<br>G. Explain the relationship between the DTM and the shift from subsistence to commercial agriculture.",
         rubric: [
@@ -113,7 +135,7 @@ const frqLibrary = [
     {
         title: "FRQ 14: Agricultural Land Use (Von Thünen)",
         type: "image",
-        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Von_Thunen_Model.svg/600px-Von_Thunen_Model.svg.png",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Von_Thunen_Model.svg/960px-Von_Thunen_Model.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20150513071323",
         caption: "Figure 3: Spatial layout of Von Thünen's Land Use Model.",
         prompt: "A. Identify the primary factor Von Thünen used to determine the location of agricultural activities.<br>B. Describe why dairy farming is located in the ring closest to the market.<br>C. Explain why the second ring was historically used for timber/forestry.<br>D. Explain how modern refrigeration technology has modified the rings of this model.<br>E. Describe one way the model fails to account for physical geography features like rivers.<br>F. Explain the concept of 'Bid-Rent Theory' as it relates to this model.<br>G. Explain the degree to which Von Thünen’s model is still relevant to global commercial agriculture.",
         rubric: [
@@ -282,33 +304,16 @@ const frqLibrary = [
 
 let activeFrq = null;
 
-function startFRQ() {
-    // 1. Pick a random FRQ
-    activeFrq = frqLibrary[Math.floor(Math.random() * frqLibrary.length)];
-    
-    // 2. Show the work area, hide the setup
-    document.getElementById('setup-frq').classList.add('hidden');
-    document.getElementById('frq-work-area').classList.remove('hidden');
-    
-    // 3. Set the Title and the Prompt text
-    document.getElementById('frq-title').innerText = activeFrq.title;
-    document.getElementById('frq-prompt').innerHTML = activeFrq.prompt;
-    
-    // 4. Handle the Stimulus (Image or Table)
-    const stimBox = document.getElementById('frq-stimulus-container');
-    stimBox.innerHTML = ""; // Clear out old images
-    
-    if (activeFrq.type === "image") {
-        stimBox.innerHTML = `
-            <img src="${activeFrq.stimulus}" style="max-width:100%; border:2px solid #e2e8f0; border-radius:8px; display:block; margin:auto;">
-            <p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>
-        `;
-    } else if (activeFrq.type === "table") {
-        stimBox.innerHTML = `
-            <div style="overflow-x:auto;">${activeFrq.stimulus}</div>
-            <p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>
-        `;
+function startFRQ(index) {
+    if (index === -1) {
+        // If they clicked "Random"
+        activeFrq = frqLibrary[Math.floor(Math.random() * frqLibrary.length)];
+    } else {
+        // If they picked a specific one from the menu
+        activeFrq = frqLibrary[index];
     }
+    
+    // ... the rest of your display logic goes here ...
 }
 
 function gradeFRQ() {
@@ -337,6 +342,18 @@ function gradeFRQ() {
     document.getElementById('frq-work-area').classList.add('hidden');
     document.getElementById('frq-results').classList.remove('hidden');
     document.getElementById('final-score-display').innerText = `${earned} / ${activeFrq.rubric.length}`;
+}
+function initPicker() {
+    const list = document.getElementById('frq-selection-list');
+    list.innerHTML = ""; // Clear it first
+    
+    frqLibrary.forEach((frq, index) => {
+        const card = document.createElement('div');
+        card.className = 'frq-card'; // Make sure you have the CSS for .frq-card
+        card.innerHTML = `<strong>${index + 1}.</strong> ${frq.title}`;
+        card.onclick = () => startFRQ(index);
+        list.appendChild(card);
+    });
 }
 </script>
 </body>
