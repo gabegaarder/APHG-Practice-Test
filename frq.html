@@ -62,7 +62,7 @@
         <h2 id="frq-title" style="color: var(--primary);"></h2>
     
         <div id="frq-stimulus-container" style="margin-bottom: 1.5rem;"></div>
-    
+        <div id="frq-timer" style="font-weight: bold; color: var(--accent); margin-bottom: 10px;">Time: 00:00</div>
         <div id="frq-prompt" class="prompt-box"></div>
         <textarea id="frq-input" placeholder="Label your sections (A, B, C...) and write your full response here..."></textarea>
         <button onclick="gradeFRQ()">Submit for Automated Review</button>
@@ -395,7 +395,33 @@ const frqLibrary = [
 ];
 
 let activeFrq = null;
+let frqStartTime;
+let frqTimerInterval;
 
+function startFrqTimer() {
+    clearInterval(frqTimerInterval); // Reset if one was running
+    let seconds = 0;
+    const timerDisplay = document.getElementById('frq-timer');
+    
+    frqTimerInterval = setInterval(() => {
+        seconds++;
+        let mins = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+        timerDisplay.innerText = `Time: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+// Update your startFRQ function to include the timer call:
+function startFRQ(index) {
+    // ... your existing code ...
+    startFrqTimer(); // Start the clock!
+}
+
+// Update your gradeFRQ function to stop the timer:
+function gradeFRQ() {
+    clearInterval(frqTimerInterval);
+    // ... your existing grading code ...
+}
 // The "DOMContentLoaded" wrapper is key to making the list show up
 window.addEventListener('DOMContentLoaded', () => {
     initPicker();
