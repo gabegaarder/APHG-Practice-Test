@@ -299,6 +299,98 @@ const frqLibrary = [
             {id:"F", kw:["raw","cheap","export","manufactured"], desc:"Core-Periphery Flow"},
             {id:"G", kw:["secondary","tertiary","mechanization","urban"], desc:"Labor Shift"}
         ]
+    },
+    {
+        title: "FRQ 16: Burgess Concentric Zone Model",
+        type: "image",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Burgess_model.svg/600px-Burgess_model.svg.png",
+        caption: "Figure 4: The Burgess Concentric Zone Model of Urban Land Use.",
+        prompt: "A. Identify the zone where transition and low-income housing are typically located.<br>B. Describe the relationship between land cost and distance from the CBD in this model.<br>C. Explain one reason why the 'Zone of Better Residences' is located further from the city center.<br>D. Explain how the transportation technology of the early 20th century influenced this model's shape.<br>E. Describe one way the Concentric Zone model fails to describe modern polycentric cities.<br>F. Explain the concept of 'invasion and succession' within the transition zone.<br>G. Explain the degree to which gentrification has reversed the patterns shown in this model.",
+        rubric: [
+            {id:"A", kw:["zone 2","transition"], desc:"Zone Identification"},
+            {id:"B", kw:["bid-rent","higher","expensive","distance"], desc:"Land Cost/Distance"},
+            {id:"C", kw:["space","pollution","noise","suburb","yard"], desc:"Residential Location"},
+            {id:"D", kw:["walking","streetcar","rail","limited"], desc:"Transport Tech"},
+            {id:"E", kw:["edge city","suburban","multi","nuclei"], desc:"Modern Failure"},
+            {id:"F", kw:["migration","neighborhood","change","displacement"], desc:"Invasion/Succession"},
+            {id:"G", kw:["urban","return","central","middle-class"], desc:"Gentrification"}
+        ]
+    },
+    {
+        title: "FRQ 17: Rostow's Stages of Growth",
+        type: "table",
+        stimulus: `
+            <table style="width:100%; border-collapse: collapse; margin-top:10px; border: 1px solid #ddd;">
+                <tr style="background:#f1f5f9;"><th>Feature</th><th>Stage 2 (Preconditions)</th><th>Stage 4 (Drive to Maturity)</th></tr>
+                <tr><td>Labor Force</td><td>Mainly Agriculture</td><td>Skilled/Technical</td></tr>
+                <tr><td>Economy</td><td>Raw Material Export</td><td>Wide Industrial Base</td></tr>
+                <tr><td>Tech</td><td>Beginning Infrastructure</td><td>Rapid Diffusion</td></tr>
+            </table>`,
+        caption: "Table 3: Comparison of Rostow’s Development Stages.",
+        prompt: "A. Identify the stage in Rostow’s model that is characterized by the 'Take-off' into industrialization.<br>B. Describe the primary shift in the labor force as a country moves from Stage 2 to Stage 4.<br>C. Explain how the availability of capital investment triggers the transition to Stage 3.<br>D. Explain one criticism of Rostow’s model regarding its Eurocentric bias.<br>E. Describe the relationship between Rostow’s model and the Demographic Transition Model.<br>F. Explain how a country in Stage 4 might benefit from international trade agreements.<br>G. Explain why some LDCs today may find it difficult to move past Stage 2 due to dependency.",
+        rubric: [
+            {id:"A", kw:["stage 3","take-off"], desc:"Take-off stage"},
+            {id:"B", kw:["secondary","tertiary","agriculture","manufacturing"], desc:"Labor Shift"},
+            {id:"C", kw:["investment","banks","savings","infrastructure"], desc:"Capital Trigger"},
+            {id:"D", kw:["west","europe","linear","culture"], desc:"Eurocentric Bias"},
+            {id:"E", kw:["stage 3","stage 4","industrial","fertility"], desc:"DTM Link"},
+            {id:"F", kw:["export","market","comparative","global"], desc:"Trade Benefits"},
+            {id:"G", kw:["debt","periphery","commodity","dependency"], desc:"Development Difficulty"}
+        ]
+    },
+    {
+        title: "FRQ 18: Global Migration Streams",
+        type: "image",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Net_Migration_Rate.svg/1024px-Net_Migration_Rate.svg.png",
+        caption: "Figure 5: Global Net Migration Rates (Blue = Positive, Red = Negative).",
+        prompt: "A. Identify a region on the map that consistently shows a high negative net migration rate.<br>B. Describe the primary 'pull factor' for migrants moving into Western Europe or North America.<br>C. Explain how 'brain drain' affects the development potential of countries in the Global South.<br>D. Explain the concept of 'chain migration' and how it influences destination patterns.<br>E. Describe one political obstacle a migrant might face when attempting to enter a 'Core' country.<br>F. Explain how the 'Gravity Model' predicts the volume of migration between two cities.<br>G. Explain the role of remittances in the economy of the migrant's home country.",
+        rubric: [
+            {id:"A", kw:["africa","latin america","south asia"], desc:"Region ID"},
+            {id:"B", kw:["jobs","economic","wages","opportunity"], desc:"Pull Factor"},
+            {id:"C", kw:["educated","doctors","skilled","human capital"], desc:"Brain Drain"},
+            {id:"D", kw:["family","kinship","community","neighborhood"], desc:"Chain Migration"},
+            {id:"E", kw:["visa","quota","border","wall","deportation"], desc:"Obstacles"},
+            {id:"F", kw:["population","distance","size","interaction"], desc:"Gravity Model"},
+            {id:"G", kw:["money","income","gdp","poverty","transfer"], desc:"Remittances"}
+        ]
+    },
+    {
+        title: "FRQ 19: Language & Globalization",
+        type: "table",
+        stimulus: `
+            <table style="width:100%; border-collapse: collapse; margin-top:10px; border: 1px solid #ddd;">
+                <tr style="background:#f1f5f9;"><th>Language Status</th><th>Description</th><th>Example</th></tr>
+                <tr><td>Lingua Franca</td><td>Global Trade Language</td><td>English</td></tr>
+                <tr><td>Endangered</td><td>Fewer than 1,000 speakers</td><td>Ainu (Japan)</td></tr>
+                <tr><td>Revived</td><td>Language brought back to use</td><td>Hebrew</td></tr>
+            </table>`,
+        caption: "Table 4: Status of Global Languages in the 21st Century.",
+        prompt: "A. Define the term 'lingua franca' based on the table provided.<br>B. Describe one spatial factor that contributes to a language becoming endangered.<br>C. Explain how the internet and social media act as agents of cultural homogenization.<br>D. Explain why a government might adopt an 'Official Language' policy.<br>E. Describe the process of 'creolization' in the development of new languages.<br>F. Explain how the colonial era influenced the current distribution of Spanish and Portuguese.<br>G. Explain the degree to which language preservation is tied to ethnic identity.",
+        rubric: [
+            {id:"A", kw:["trade","common","communication"], desc:"Lingua Franca"},
+            {id:"B", kw:["isolation","mountain","island","urbanization"], desc:"Endangered Factor"},
+            {id:"C", kw:["english","pop culture","diffusion","standard"], desc:"Homogenization"},
+            {id:"D", kw:["unity","nationalism","administration","efficiency"], desc:"Official Language"},
+            {id:"E", kw:["pidgin","native","blend","colonial"], desc:"Creolization"},
+            {id:"F", kw:["imperialism","treaty","america","africa"], desc:"Colonial Influence"},
+            {id:"G", kw:["culture","heritage","pride","sovereignty"], desc:"Ethnic Identity"}
+        ]
+    },
+    {
+        title: "FRQ 20: Industrial Location (Weber)",
+        type: "image",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Webers_least_cost_theory.png",
+        caption: "Figure 6: Weber’s Least Cost Theory (Material Index Diagram).",
+        prompt: "A. Identify the primary cost that Weber’s model seeks to minimize.<br>B. Describe the difference between a weight-gaining and a weight-losing industry.<br>C. Explain why a copper smelting plant is likely to be located near the raw material source.<br>D. Explain how the 'agglomeration' effect can override the need for low transportation costs.<br>E. Describe how the 'just-in-time' delivery system has modified industrial locations.<br>F. Explain the role of labor costs in the decision to outsource manufacturing to LDCs.<br>G. Explain why Weber’s model may be less relevant for high-tech or service-sector industries.",
+        rubric: [
+            {id:"A", kw:["transport","transportation","shipping"], desc:"Primary Cost"},
+            {id:"B", kw:["bulk","heavy","market","source"], desc:"Weight Industry"},
+            {id:"C", kw:["bulk-reducing","weight-losing","waste"], desc:"Copper Location"},
+            {id:"D", kw:["cluster","shared","services","talent"], desc:"Agglomeration"},
+            {id:"E", kw:["efficient","inventory","market","proximity"], desc:"Just-in-time"},
+            {id:"F", kw:["cheap","wages","global","profit"], desc:"Labor/Outsource"},
+            {id:"G", kw:["footloose","software","digital","weightless"], desc:"Tech Relevance"}
+        ]
     }
 ];
 
