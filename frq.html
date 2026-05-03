@@ -53,7 +53,7 @@
 
     <div id="setup-frq" class="screen">
         <h2>Choose Your FRQ Prompt</h2>
-        <button onclick="startFRQ(-1)" style="background: #1e293b; margin-bottom: 20px;">🎲 Random Prompt</button>
+        <button onclick="startFRQ(-1)" style="background: #1e293b; margin-bottom: 20px;">Random Prompt</button>
     
         <div id="frq-selection-list" class="frq-grid"></div>
     </div>
@@ -394,27 +394,21 @@ const frqLibrary = [
     }
 ];
 
-// Wrap everything in an event listener to ensure the HTML is ready
+let activeFrq = null;
+
+// The "DOMContentLoaded" wrapper is key to making the list show up
 window.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed. Initializing Picker...");
     initPicker();
 });
 
-let activeFrq = null;
-
 function initPicker() {
     const list = document.getElementById('frq-selection-list');
-    if (!list) {
-        console.error("Could not find the element 'frq-selection-list'. Check your HTML IDs.");
-        return;
-    }
-
+    if (!list) return;
     list.innerHTML = ""; 
     
     frqLibrary.forEach((frq, index) => {
         const card = document.createElement('div');
         card.className = 'frq-card';
-        // Add a badge if it has a stimulus
         const badge = frq.stimulus ? `<span style="font-size:0.7rem; background:#e0e7ff; color:#4338ca; padding:2px 6px; border-radius:4px; margin-left:8px;">STIMULUS</span>` : "";
         card.innerHTML = `<strong>${index + 1}.</strong> ${frq.title} ${badge}`;
         card.onclick = () => startFRQ(index);
@@ -423,42 +417,29 @@ function initPicker() {
 }
 
 function startFRQ(index) {
-    // Pick the FRQ
     if (index === -1) {
         activeFrq = frqLibrary[Math.floor(Math.random() * frqLibrary.length)];
     } else {
         activeFrq = frqLibrary[index];
     }
     
-    // UI Transitions
     document.getElementById('setup-frq').classList.add('hidden');
     document.getElementById('frq-work-area').classList.remove('hidden');
     document.getElementById('frq-input').value = ""; 
-    
-    // Set Text Content
     document.getElementById('frq-title').innerText = activeFrq.title;
     document.getElementById('frq-prompt').innerHTML = activeFrq.prompt;
     
-    // Handle Stimulus
     const stimContainer = document.getElementById('frq-stimulus-container');
     stimContainer.innerHTML = ""; 
     
     if (activeFrq.type === "image") {
-        stimContainer.innerHTML = `
-            <img src="${activeFrq.stimulus}" style="max-width:100%; height:auto; border:2px solid #e2e8f0; border-radius:8px; display:block; margin:auto;" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Image+Load+Error';">
-            <p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px; font-style:italic;">${activeFrq.caption}</p>
-        `;
+        stimContainer.innerHTML = `<img src="${activeFrq.stimulus}" style="max-width:100%; border:2px solid #e2e8f0; border-radius:8px; display:block; margin:auto;"><p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>`;
     } else if (activeFrq.type === "table") {
-        stimContainer.innerHTML = `
-            <div style="overflow-x:auto;">${activeFrq.stimulus}</div>
-            <p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px; font-style:italic;">${activeFrq.caption}</p>
-        `;
+        stimContainer.innerHTML = `<div style="overflow-x:auto;">${activeFrq.stimulus}</div><p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>`;
     }
 }
 
 function gradeFRQ() {
-    if (!activeFrq) return;
-
     const input = document.getElementById('frq-input').value.toLowerCase();
     const fbList = document.getElementById('frq-feedback-list');
     fbList.innerHTML = '';
@@ -467,17 +448,10 @@ function gradeFRQ() {
     activeFrq.rubric.forEach(part => {
         const hasKeywords = part.kw.some(word => input.includes(word));
         if(hasKeywords) earned++;
-
         const card = document.createElement('div');
         card.className = 'feedback-card';
         card.style.borderLeft = hasKeywords ? '5px solid var(--success)' : '5px solid var(--danger)';
-        card.innerHTML = `
-            <strong>Part ${part.id}: ${part.desc}</strong><br>
-            <span>${hasKeywords ? '✅ Point Awarded' : '❌ Key Terminology Missing'}</span>
-            <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
-                Required Concepts: ${part.kw.slice(0, 3).join(", ")}...
-            </p>
-        `;
+        card.innerHTML = `<strong>Part ${part.id}</strong>: ${hasKeywords ? '✅ Awarded' : '❌ Missing term'}`;
         fbList.appendChild(card);
     });
 
