@@ -481,7 +481,7 @@ function gradeFRQ() {
         const card = document.createElement('div');
         card.className = 'feedback-card';
         card.style.borderLeft = hasKeywords ? '5px solid var(--success)' : '5px solid var(--danger)';
-        card.innerHTML = `<strong>Part ${part.id}</strong>: ${hasKeywords ? '✅ Point Awarded' : '❌ Key terminology missing'}`;
+        card.innerHTML = `<strong>Part ${part.id}</strong>: ${hasKeywords ? 'Point Awarded' : 'Key terminology missing'}`;
         fbList.appendChild(card);
     });
 
