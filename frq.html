@@ -284,7 +284,18 @@ function startFRQ() {
     document.getElementById('setup-frq').classList.add('hidden');
     document.getElementById('frq-work-area').classList.remove('hidden');
     document.getElementById('frq-title').innerText = activeFrq.title;
-    document.getElementById('frq-prompt').innerHTML = activeFrq.prompt;
+    
+    // Stimulus Logic
+    const stimContainer = document.getElementById('frq-prompt');
+    let stimulusHtml = "";
+    
+    if(activeFrq.type === "image") {
+        stimulusHtml = `<img src="${activeFrq.stimulus}" style="max-width:100%; border:1px solid #ccc; border-radius:5px;"><br>`;
+    } else if (activeFrq.type === "table") {
+        stimulusHtml = activeFrq.stimulus;
+    }
+    
+    stimContainer.innerHTML = stimulusHtml + `<p style="font-size:0.8rem; color:#666;">${activeFrq.caption}</p><hr>` + activeFrq.prompt;
 }
 
 function gradeFRQ() {
