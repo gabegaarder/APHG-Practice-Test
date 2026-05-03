@@ -395,34 +395,10 @@ const frqLibrary = [
 ];
 
 let activeFrq = null;
-let frqStartTime;
-let frqTimerInterval;
+let seconds = 0;
+let frqTimerInterval = null;
 
-function startFrqTimer() {
-    clearInterval(frqTimerInterval); // Reset if one was running
-    let seconds = 0;
-    const timerDisplay = document.getElementById('frq-timer');
-    
-    frqTimerInterval = setInterval(() => {
-        seconds++;
-        let mins = Math.floor(seconds / 60);
-        let secs = seconds % 60;
-        timerDisplay.innerText = `Time: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }, 1000);
-}
-
-// Update your startFRQ function to include the timer call:
-function startFRQ(index) {
-    // ... your existing code ...
-    startFrqTimer(); // Start the clock!
-}
-
-// Update your gradeFRQ function to stop the timer:
-function gradeFRQ() {
-    clearInterval(frqTimerInterval);
-    // ... your existing grading code ...
-}
-// The "DOMContentLoaded" wrapper is key to making the list show up
+// BUILD THE MENU ON LOAD
 window.addEventListener('DOMContentLoaded', () => {
     initPicker();
 });
@@ -442,6 +418,26 @@ function initPicker() {
     });
 }
 
+function startFrqTimer() {
+    // Reset if a timer is already running
+    if (frqTimerInterval) clearInterval(frqTimerInterval);
+    
+    seconds = 0;
+    const timerDisplay = document.getElementById('frq-timer');
+    timerDisplay.innerText = "Time: 00:00";
+    
+    frqTimerInterval = setInterval(() => {
+        seconds++;
+        let mins = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+        
+        let displayMins = mins < 10 ? "0" + mins : mins;
+        let displaySecs = secs < 10 ? "0" + secs : secs;
+        
+        timerDisplay.innerText = `Time: ${displayMins}:${displaySecs}`;
+    }, 1000);
+}
+
 function startFRQ(index) {
     if (index === -1) {
         activeFrq = frqLibrary[Math.floor(Math.random() * frqLibrary.length)];
@@ -449,23 +445,31 @@ function startFRQ(index) {
         activeFrq = frqLibrary[index];
     }
     
+    // UI Transitions
     document.getElementById('setup-frq').classList.add('hidden');
     document.getElementById('frq-work-area').classList.remove('hidden');
     document.getElementById('frq-input').value = ""; 
     document.getElementById('frq-title').innerText = activeFrq.title;
     document.getElementById('frq-prompt').innerHTML = activeFrq.prompt;
     
+    // Handle Stimulus Display
     const stimContainer = document.getElementById('frq-stimulus-container');
     stimContainer.innerHTML = ""; 
     
     if (activeFrq.type === "image") {
-        stimContainer.innerHTML = `<img src="${activeFrq.stimulus}" style="max-width:100%; border:2px solid #e2e8f0; border-radius:8px; display:block; margin:auto;"><p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>`;
+        stimContainer.innerHTML = `<img src="${activeFrq.stimulus}" style="max-width:100%; border:2px solid #e2e8f0; border-radius:8px; display:block; margin:auto;"><p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px; font-style:italic;">${activeFrq.caption}</p>`;
     } else if (activeFrq.type === "table") {
-        stimContainer.innerHTML = `<div style="overflow-x:auto;">${activeFrq.stimulus}</div><p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>`;
+        stimContainer.innerHTML = `<div style="overflow-x:auto;">${activeFrq.stimulus}</div><p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px; font-style:italic;">${activeFrq.caption}</p>`;
     }
+
+    // START THE TIMER
+    startFrqTimer();
 }
 
 function gradeFRQ() {
+    // STOP THE TIMER
+    clearInterval(frqTimerInterval);
+
     const input = document.getElementById('frq-input').value.toLowerCase();
     const fbList = document.getElementById('frq-feedback-list');
     fbList.innerHTML = '';
@@ -477,7 +481,7 @@ function gradeFRQ() {
         const card = document.createElement('div');
         card.className = 'feedback-card';
         card.style.borderLeft = hasKeywords ? '5px solid var(--success)' : '5px solid var(--danger)';
-        card.innerHTML = `<strong>Part ${part.id}</strong>: ${hasKeywords ? '✅ Awarded' : '❌ Missing term'}`;
+        card.innerHTML = `<strong>Part ${part.id}</strong>: ${hasKeywords ? '✅ Point Awarded' : '❌ Key terminology missing'}`;
         fbList.appendChild(card);
     });
 
@@ -486,5 +490,3 @@ function gradeFRQ() {
     document.getElementById('final-score-display').innerText = `${earned} / ${activeFrq.rubric.length}`;
 }
 </script>
-</body>
-</html>
