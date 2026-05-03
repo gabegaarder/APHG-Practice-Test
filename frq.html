@@ -38,6 +38,9 @@
 
     <div id="frq-work-area" class="screen hidden">
         <h2 id="frq-title" style="color: var(--primary);"></h2>
+    
+        <div id="frq-stimulus-container" style="margin-bottom: 1.5rem;"></div>
+    
         <div id="frq-prompt" class="prompt-box"></div>
         <textarea id="frq-input" placeholder="Label your sections (A, B, C...) and write your full response here..."></textarea>
         <button onclick="gradeFRQ()">Submit for Automated Review</button>
@@ -280,22 +283,32 @@ const frqLibrary = [
 let activeFrq = null;
 
 function startFRQ() {
+    // 1. Pick a random FRQ
     activeFrq = frqLibrary[Math.floor(Math.random() * frqLibrary.length)];
+    
+    // 2. Show the work area, hide the setup
     document.getElementById('setup-frq').classList.add('hidden');
     document.getElementById('frq-work-area').classList.remove('hidden');
+    
+    // 3. Set the Title and the Prompt text
     document.getElementById('frq-title').innerText = activeFrq.title;
+    document.getElementById('frq-prompt').innerHTML = activeFrq.prompt;
     
-    // Stimulus Logic
-    const stimContainer = document.getElementById('frq-prompt');
-    let stimulusHtml = "";
+    // 4. Handle the Stimulus (Image or Table)
+    const stimBox = document.getElementById('frq-stimulus-container');
+    stimBox.innerHTML = ""; // Clear out old images
     
-    if(activeFrq.type === "image") {
-        stimulusHtml = `<img src="${activeFrq.stimulus}" style="max-width:100%; border:1px solid #ccc; border-radius:5px;"><br>`;
+    if (activeFrq.type === "image") {
+        stimBox.innerHTML = `
+            <img src="${activeFrq.stimulus}" style="max-width:100%; border:2px solid #e2e8f0; border-radius:8px; display:block; margin:auto;">
+            <p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>
+        `;
     } else if (activeFrq.type === "table") {
-        stimulusHtml = activeFrq.stimulus;
+        stimBox.innerHTML = `
+            <div style="overflow-x:auto;">${activeFrq.stimulus}</div>
+            <p style="font-size:0.85rem; color:#64748b; text-align:center; margin-top:10px;">${activeFrq.caption}</p>
+        `;
     }
-    
-    stimContainer.innerHTML = stimulusHtml + `<p style="font-size:0.8rem; color:#666;">${activeFrq.caption}</p><hr>` + activeFrq.prompt;
 }
 
 function gradeFRQ() {
