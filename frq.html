@@ -53,6 +53,99 @@
 <script>
 const frqLibrary = [
     {
+        title: "FRQ 11: Population Pyramid Analysis (Stimulus)",
+        type: "image",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Population_pyramid_of_Japan_2022.svg/800px-Population_pyramid_of_Japan_2022.svg.png",
+        caption: "Figure 1: Population Pyramid of a Highly Developed Country (Stage 5 DTM)",
+        prompt: "A. Identify the demographic stage of the country shown in the pyramid.<br>B. Describe the specific shape of the pyramid's base and what it indicates about the TFR.<br>C. Explain one social reason for the narrowing of the 0-14 age cohorts.<br>D. Explain one economic challenge this country will face in 20 years regarding its dependency ratio.<br>E. Describe one pro-natalist policy this government might use to shift the pyramid's shape.<br>F. Explain how the pyramid's shape reflects the country's position in the Epidemiologic Transition Model.<br>G. Explain why a country with this pyramid shape would likely have high rates of net-in migration.",
+        rubric: [
+            {id:"A", kw:["stage 5","5"], desc:"DTM Stage"},
+            {id:"B", kw:["narrow","contracting","low tfr","decreasing"], desc:"Pyramid Base"},
+            {id:"C", kw:["education","women","careers","contraception","cost"], desc:"Social Reason"},
+            {id:"D", kw:["elderly","tax","labor shortage","pension","care"], desc:"Economic Challenge"},
+            {id:"E", kw:["subsidy","childcare","tax break","bonus","leave"], desc:"Pro-natalist"},
+            {id:"F", kw:["degenerative","aging","delayed","chronic"], desc:"ETM Connection"},
+            {id:"G", kw:["labor","jobs","replacement","migrants"], desc:"In-Migration"}
+        ]
+    },
+    {
+        title: "FRQ 12: Urban Data Table (Stimulus)",
+        type: "table",
+        stimulus: `
+            <table style="width:100%; border-collapse: collapse; margin-top:10px; border: 1px solid #ddd;">
+                <tr style="background:#f1f5f9;"><th>City Name</th><th>Population (Millions)</th><th>Rank</th></tr>
+                <tr><td>City A</td><td>12.5</td><td>1</td></tr>
+                <tr><td>City B</td><td>6.2</td><td>2</td></tr>
+                <tr><td>City C</td><td>4.1</td><td>3</td></tr>
+                <tr><td>City D</td><td>3.1</td><td>4</td></tr>
+            </table>`,
+        caption: "Table 1: Population of the top 4 cities in Country X",
+        prompt: "A. Identify whether the urban system in Country X follows the Rank-Size Rule or the Primate City Rule.<br>B. Describe the Rank-Size Rule formula.<br>C. Explain how the urban system shown in the table reflects the level of economic development in the country.<br>D. Describe one advantage of a country having a primate city.<br>E. Explain one disadvantage of a primate city regarding regional economic inequality.<br>F. Explain how Central Place Theory accounts for the spacing between City A and City D.<br>G. Explain the degree to which a primate city can limit a country's total economic potential.",
+        rubric: [
+            {id:"A", kw:["rank-size","rank size"], desc:"Urban System Type"},
+            {id:"B", kw:["1/n","fraction","proportional","nth"], desc:"Rank-Size Formula"},
+            {id:"C", kw:["mdc","developed","integrated","distribution"], desc:"Economic Link"},
+            {id:"D", kw:["hub","investment","culture","centralization","global"], desc:"Primate Advantage"},
+            {id:"E", kw:["brain drain","neglect","uneven","infrastructure"], desc:"Regional Inequality"},
+            {id:"F", kw:["threshold","range","hinterland","spacing"], desc:"CPT Spacing"},
+            {id:"G", kw:["concentration","vulnerability","neglect","secondary"], desc:"Economic Potential"}
+        ]
+    },
+    {
+        title: "FRQ 13: The Demographic Transition Graph",
+        type: "image",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Demographic-Transition-Model.svg/1024px-Demographic-Transition-Model.svg.png",
+        caption: "Figure 2: The classic five stages of the Demographic Transition Model.",
+        prompt: "A. Identify the stage where the Natural Increase Rate (NIR) is at its peak.<br>B. Describe the relationship between the CBR and CDR in Stage 4.<br>C. Explain why the death rate drops rapidly in Stage 2.<br>D. Explain why the birth rate begins to fall in Stage 3.<br>E. Describe the limitations of applying this model to LDCs today.<br>F. Explain how the Second Agricultural Revolution influenced the transition to Stage 2.<br>G. Explain the relationship between the DTM and the shift from subsistence to commercial agriculture.",
+        rubric: [
+            {id:"A", kw:["stage 2","2"], desc:"NIR Peak"},
+            {id:"B", kw:["low","stable","equal","zero"], desc:"Stage 4 Relationship"},
+            {id:"C", kw:["medicine","sanitation","water","nutrition"], desc:"Stage 2 CDR"},
+            {id:"D", kw:["urbanization","education","women","child labor"], desc:"Stage 3 CBR"},
+            {id:"E", kw:["time","diffusion","faster","aid"], desc:"LDC Limitation"},
+            {id:"F", kw:["food surplus","technology","yield"], desc:"Ag Rev Link"},
+            {id:"G", kw:["market","efficiency","mechanization"], desc:"Ag Transition"}
+        ]
+    },
+    {
+        title: "FRQ 14: Agricultural Land Use (Von Thünen)",
+        type: "image",
+        stimulus: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Von_Thunen_Model.svg/600px-Von_Thunen_Model.svg.png",
+        caption: "Figure 3: Spatial layout of Von Thünen's Land Use Model.",
+        prompt: "A. Identify the primary factor Von Thünen used to determine the location of agricultural activities.<br>B. Describe why dairy farming is located in the ring closest to the market.<br>C. Explain why the second ring was historically used for timber/forestry.<br>D. Explain how modern refrigeration technology has modified the rings of this model.<br>E. Describe one way the model fails to account for physical geography features like rivers.<br>F. Explain the concept of 'Bid-Rent Theory' as it relates to this model.<br>G. Explain the degree to which Von Thünen’s model is still relevant to global commercial agriculture.",
+        rubric: [
+            {id:"A", kw:["transport","cost","distance","rent"], desc:"Primary Factor"},
+            {id:"B", kw:["perishable","spoils","milk","fresh"], desc:"Dairy/Market"},
+            {id:"C", kw:["weight","fuel","building","heavy"], desc:"Forestry ring"},
+            {id:"D", kw:["refrigeration","distance","decay","expanded"], desc:"Tech Modification"},
+            {id:"E", kw:["river","mountain","isotropic","transport"], desc:"Physical Geo"},
+            {id:"F", kw:["land value","cost","center","expensive"], desc:"Bid-Rent"},
+            {id:"G", kw:["global","markets","specialization","transport"], desc:"Relevance"}
+        ]
+    },
+    {
+        title: "FRQ 15: Global Development Data",
+        type: "table",
+        stimulus: `
+            <table style="width:100%; border-collapse: collapse; margin-top:10px; border: 1px solid #ddd;">
+                <tr style="background:#f1f5f9;"><th>Country</th><th>GNI per Capita</th><th>Life Expectancy</th><th>% in Agriculture</th></tr>
+                <tr><td>Norway</td><td>$66,000</td><td>83</td><td>2%</td></tr>
+                <tr><td>Vietnam</td><td>$8,000</td><td>75</td><td>38%</td></tr>
+                <tr><td>Ethiopia</td><td>$2,500</td><td>66</td><td>70%</td></tr>
+            </table>`,
+        caption: "Table 2: Socio-economic indicators for three select countries.",
+        prompt: "A. Identify which country is most likely in the 'Periphery' of Wallerstein's World Systems Theory.<br>B. Describe the relationship between GNI per capita and the percentage of the labor force in agriculture.<br>C. Explain how high life expectancy in Norway contributes to a high HDI score.<br>D. Explain why Ethiopia has a high percentage of its population working in the primary sector.<br>E. Describe one barrier to development for countries with a high reliance on subsistence agriculture.<br>F. Explain how the core-periphery model explains the flow of raw materials between these countries.<br>G. Explain the relationship between industrialization and the shift in labor sectors.",
+        rubric: [
+            {id:"A", kw:["ethiopia"], desc:"Periphery Identification"},
+            {id:"B", kw:["inverse","negative","lower","higher"], desc:"GNI/Ag Relation"},
+            {id:"C", kw:["health","hdi","well-being","index"], desc:"Life Expectancy"},
+            {id:"D", kw:["subsistence","extraction","development","stage"], desc:"Primary Sector"},
+            {id:"E", kw:["capital","infrastructure","surplus","education"], desc:"Barrier"},
+            {id:"F", kw:["raw","cheap","export","manufactured"], desc:"Core-Periphery Flow"},
+            {id:"G", kw:["secondary","tertiary","mechanization","urban"], desc:"Labor Shift"}
+        ]
+    },
+    {
         title: "FRQ 1: Urban Dynamics & Sustainability",
         prompt: "A. Describe one type of voluntary migration.<br>B. Explain how migration may affect a city’s economy.<br>C. Describe one type of housing discrimination that may occur in urban areas.<br>D. Explain how a city’s infrastructure affects society.<br>E. Describe one challenge to sustainability in urban areas.<br>F. Explain how urban design initiatives are intended to affect cities.<br>G. Explain why urban design initiatives may be criticized.",
         rubric: [
